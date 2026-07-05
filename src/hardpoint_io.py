@@ -23,39 +23,70 @@ import numpy as np
 import pandas as pd
 
 np.set_printoptions(suppress=True, precision=3)
-def mods(arr):
+def mods1(arr):
     arr2=np.empty(3)
     arr2[[0,1]]=(-arr[[0,1]])
     arr2[0]=arr2[0]+1000
+    arr2[2]=arr[2]
     return arr2
 
 frontsus_df=pd.read_csv(r"C:\PROGRAMMING\Codes\SUSPENSION KINEMATICS SIMULATOR\CODE REPOSITORY\data\frontsusFINAL2.txt")
 frontsus_df.set_index('LABEL',inplace=True)
 
-mapping=dict()
-UA,UF,UBJ,LA,LF,LBJ,TRI,TRO,WC,CP,PRO,RPA1,RPA2,RPR,RD,DC=[np.empty(3) for _ in range(16)]
-mapping={
-    'Lower wishbone front pivot':LF,
-    'Lower wishbone rear pivot':LA,
-    'Lower wishbone outer ball joint':LBJ,
-    'Upper wishbone front pivot':UF,
-    'Upper wishbone rear pivot':UA,
-    'Upper wishbone outer ball joint':UBJ,
-    'Push rod wishbone end':PRO,
-    'Push rod rocker end':RPR,
-    'Outer track rod ball joint':TRO,
-    'Inner track rod ball joint':TRI,
-    'Damper to body point':DC,
-    'Damper to rocker point':RD,
-    'Wheel centre point':WC,
-    'Rocker axis 1st point':RPA1,
-    'Rocker axis 2nd point':RPA2,
-    'Contact Patch':CP
+dict_FL=dict()
+dict_FL={
+    'LF':np.empty(3),
+    'LA':np.empty(3),
+    'LBJ':np.empty(3),
+    'UF':np.empty(3),
+    'UA':np.empty(3),
+    'UBJ':np.empty(3),
+    'PRO':np.empty(3),
+    'PRI':np.empty(3),
+    'TRO':np.empty(3),
+    'TRI':np.empty(3),
+    'DC':np.empty(3),
+    'RD':np.empty(3),
+    'WC':np.empty(3),
+    'RPA1':np.empty(3),
+    'RPA2':np.empty(3),
+    'CP':np.empty(3),
+    'WSP':np.empty(3)
 }
-i=0
-for k,v in mapping.items():
+for k,v in dict_FL.items():
     temp=frontsus_df.loc[k,['X','Y','Z']].values
-    v=mods(temp)
-    i=i+1
-    print(v)
-print(i)
+    temp=(np.array([[-1,0,0],[0,1,0],[0,0,1]]@temp))
+    temp[0]=temp[0]+1000
+    dict_FL[k]=temp
+
+dict_FR=dict()
+dict_FR={
+    'LF':np.empty(3),
+    'LA':np.empty(3),
+    'LBJ':np.empty(3),
+    'UF':np.empty(3),
+    'UA':np.empty(3),
+    'UBJ':np.empty(3),
+    'PRO':np.empty(3),
+    'PRI':np.empty(3),
+    'TRO':np.empty(3),
+    'TRI':np.empty(3),
+    'DC':np.empty(3),
+    'RD':np.empty(3),
+    'WC':np.empty(3),
+    'RPA1':np.empty(3),
+    'RPA2':np.empty(3),
+    'CP':np.empty(3),
+    'WSP':np.empty(3)
+}
+
+for k,v in dict_FL.items():
+    dict_FR[k]=(np.array([[1,0,0],[0,-1,0],[0,0,1]])@v)
+
+for k,v in dict_FL.items():
+    print(k,v)
+
+print('\n')
+
+for k,v in dict_FR.items():
+    print(k,v)
