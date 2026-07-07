@@ -23,12 +23,6 @@ import numpy as np
 import pandas as pd
 
 np.set_printoptions(suppress=True, precision=3)
-def mods1(arr):
-    arr2=np.empty(3)
-    arr2[[0,1]]=(-arr[[0,1]])
-    arr2[0]=arr2[0]+1000
-    arr2[2]=arr[2]
-    return arr2
 
 frontsus_df=pd.read_csv(r"C:\PROGRAMMING\Codes\SUSPENSION KINEMATICS SIMULATOR\CODE REPOSITORY\data\frontsusFINAL2.txt")
 frontsus_df.set_index('LABEL',inplace=True)
@@ -83,10 +77,8 @@ dict_FR={
 for k,v in dict_FL.items():
     dict_FR[k]=(np.array([[1,0,0],[0,-1,0],[0,0,1]])@v)
 
-for k,v in dict_FL.items():
-    print(k,v)
-
-print('\n')
-
-for k,v in dict_FR.items():
-    print(k,v)
+k_U=(dict_FL['UA']-dict_FL['UF'])/(np.linalg.norm(dict_FL['UA']-dict_FL['UF']))
+k_L=k_L=(dict_FL['LA']-dict_FL['LF'])/(np.linalg.norm(dict_FL['LA']-dict_FL['LF']))
+d1=np.linalg.norm(dict_FL['UBJ']-dict_FL['LBJ'])
+d2=np.linalg.norm(dict_FL['TRO']-dict_FL['TRI'])
+d3=np.linalg.norm(dict_FL['PRO']-dict_FL['PRI'])
