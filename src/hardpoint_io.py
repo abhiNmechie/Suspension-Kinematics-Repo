@@ -84,3 +84,4 @@ d2=np.linalg.norm(dict_FL['TRO']-dict_FL['TRI'])
 d3=np.linalg.norm(dict_FL['PRO']-dict_FL['PRI'])
 
 print(dict_FL['LBJ'])
+print(dict_FL['TRO'])
