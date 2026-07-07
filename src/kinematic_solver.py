@@ -4,9 +4,6 @@ import scipy as sp
 from scipy.optimize import brentq
 from hardpoint_io import dict_FL, dict_FR,d1,d2,d3,k_U_Left,k_L_Left
 
-#the front setup
-
-## rodrigues rotation matrix (ubj,lbj and pro me use hoga)
 def rodrigues_front(theta,k,BJ_stat_rel,vector_rel_origin):
     Kx=np.array([[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]])
     Kx2=((Kx)@(Kx))
@@ -35,7 +32,7 @@ def lower_front(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_lower_side,seed,bracke
 
 
 def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,bracket):
-    ## static shit, deriving the component along kingpin axis
+    
     kp_static=(UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat))
     v_static=(TRO_stat-LBJ_stat)
     component=(np.dot(v_static,kp_static))
@@ -43,7 +40,7 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,bracket):
     
     #seed initialization
     #tmp=np.array([1,0,0])
-    #x=(tmp-((np.dot(tmp,kp_static))/np.linalg.norm(kp_static)))  ##gram schimdt orthogonalization
+    #x=(tmp-((np.dot(tmp,kp_static))/np.linalg.norm(kp_static)))  
     #e1=(x/np.linalg.norm(x))
     #a=(v_static-component*kp_static)
     #y=((np.dot(a,e1))/((np.linalg.norm(a))*(np.linalg.norm(e1))))
@@ -51,16 +48,16 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,bracket):
     #print(z)
     #quit()
 
-    ## updated state of upright.
+
     kp_curr=(UBJ_curr-LBJ_curr)/(np.linalg.norm(UBJ_curr-LBJ_curr))
     centre_curr=((component*kp_curr)+LBJ_curr)
 
-    ## arbit vector, circle equation, then expressing tro_curr in terms of phi
+
     tmp=np.array([1,0,0])
     if np.dot(kp_curr,tmp)>0.9 or np.dot(kp_curr,tmp)<-0.9:
         tmp=np.array([0,1,0])
     
-    x=(tmp-((np.dot(tmp,kp_curr))*kp_curr)/(np.linalg.norm(kp_curr)))  ##gram schimdt orthogonalization
+    x=(tmp-((np.dot(tmp,kp_curr))*kp_curr)/(np.linalg.norm(kp_curr)))  
     e1=(x/np.linalg.norm(x))
     e2=np.cross(kp_curr,e1)
 
@@ -83,4 +80,3 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,bracket):
 
 print(tierod(dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],0.400918197828729,0.1))
 
-#VECTOR TRIAD METHOD
