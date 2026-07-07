@@ -77,8 +77,10 @@ dict_FR={
 for k,v in dict_FL.items():
     dict_FR[k]=(np.array([[1,0,0],[0,-1,0],[0,0,1]])@v)
 
-k_U=(dict_FL['UA']-dict_FL['UF'])/(np.linalg.norm(dict_FL['UA']-dict_FL['UF']))
-k_L=k_L=(dict_FL['LA']-dict_FL['LF'])/(np.linalg.norm(dict_FL['LA']-dict_FL['LF']))
+k_U_Left=(dict_FL['UA']-dict_FL['UF'])/(np.linalg.norm(dict_FL['UA']-dict_FL['UF']))
+k_L_Left=k_L=(dict_FL['LA']-dict_FL['LF'])/(np.linalg.norm(dict_FL['LA']-dict_FL['LF']))
 d1=np.linalg.norm(dict_FL['UBJ']-dict_FL['LBJ'])
 d2=np.linalg.norm(dict_FL['TRO']-dict_FL['TRI'])
 d3=np.linalg.norm(dict_FL['PRO']-dict_FL['PRI'])
+
+print(dict_FL['LBJ'])

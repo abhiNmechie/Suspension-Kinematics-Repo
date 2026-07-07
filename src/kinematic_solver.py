@@ -2,22 +2,25 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 from scipy.optimize import brentq
-from hardpoint_io import dict_FL, dict_FR,d1,d2,d3,k_U,k_L
+from hardpoint_io import dict_FL, dict_FR,d1,d2,d3,k_U_Left,k_L_Left
 
 #the rodrigues function
 
-def rodrigues(theta_U,k_U,UBJ_stat,arm):
-    UBJ_rel=(UBJ_stat-dict_FL[arm])
-    Kx=np.array([[0,-k_U[2],k_U[1]],[k_U[2],0,-k_U[0]],[-k_U[1],k_U[0],0]])
+#the front setup
+def rodrigues_front(theta,k,BJ_stat_rel,vector_rel_origin):
+    Kx=np.array([[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]])
     Kx2=((Kx)@(Kx))
     I=np.eye(3)
-    R=(I+(Kx*(np.sin(theta_U)))+(Kx2*(1-np.cos(theta_U))))
-    return (R@UBJ_rel+dict_FL[arm])
+    R=(I+(Kx*(np.sin(theta)))+(Kx2*(1-np.cos(theta))))
+    return (R@BJ_stat_rel+vector_rel_origin)                              #IT RETURNS ONLY RELATIVE VALUE NOTEEE
 
-def theta_L_solver(UBJ_curr,LBJ_stat,k_L,seed,bracket,arm):
+def upper_front(theta_U,k_U,BJ_stat_rel,vector_rel_origin):
+    UBJ_curr=(rodrigues_front(theta_U,k_U,BJ_stat_rel)+vector_rel_origin)
+    return UBJ_curr                                 ##IT ALSO RETURNS RELATIVE VALUE NOTEE
 
+def lower_front(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_lower_side,seed,bracket):
     def residual(theta_L):
-        return (np.linalg.norm(UBJ_curr-rodrigues(theta_L,k_L,LBJ_stat,arm))-d1)
+        return (np.linalg.norm(UBJ_curr-rodrigues_front(theta_L,k_lower_side,LBJ_stat_rel,vector_rel_origin))-d1)
     
     try:
         root=brentq(residual,seed-bracket,seed+bracket,xtol=1e-10)
@@ -27,5 +30,14 @@ def theta_L_solver(UBJ_curr,LBJ_stat,k_L,seed,bracket,arm):
         except:
             raise ValueError(f"The geometry exceeded {seed} limits")
     
-    LBJ_curr=rodrigues(root,k_L,LBJ_stat,arm)
+    LBJ_curr=rodrigues_front(root,k_L_Left,LBJ_stat_rel,vector_rel_origin)
+    print(root)
     return LBJ_curr
+
+
+print(lower_front(dict_FL['UBJ'],(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,0.0,0.05))
+
+def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,bracket):
+    kp_static=(UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat))
+    v_static=(TRO_stat-LBJ_stat)
+    component=(np.dot(v_static,kp_static))
