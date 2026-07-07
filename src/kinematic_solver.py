@@ -80,3 +80,19 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,bracket):
 
 print(tierod(dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],0.400918197828729,0.1))
 
+
+def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector_rel_lbj):
+
+    e1_stat=(UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat))
+    v=(TRO_stat-LBJ_stat)
+    e2_stat=(v-np.dot(v,e1_stat)*e1_stat)/(np.linalg.norm(v-np.dot(v,e1_stat)*e1_stat))
+    e3_stat=np.cross(e2_stat,e1_stat)
+    M1=np.array([[e1_stat],[e2_stat],[e3_stat]])
+
+    e1_curr=(UBJ_curr-LBJ_curr)/(np.linalg.norm(UBJ_curr-LBJ_curr))
+    v_curr=(TRO_curr-LBJ_curr)
+    e2_curr=(v_curr-np.dot(v_curr,e1_curr)*e1_curr)/(np.linalg.norm(v_curr-np.dot(v_curr,e1_curr)*e1_curr))
+    e3_curr=np.cross(e2_curr,e1_curr)
+    M2=np.array([[e1_curr],[e2_curr],[e3_curr]])
+
+    return (((M2.T)@(M1)@vector_rel_lbj)+LBJ_stat)
