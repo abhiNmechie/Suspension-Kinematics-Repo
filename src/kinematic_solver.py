@@ -12,7 +12,7 @@ def rodrigues_front(theta,k,BJ_stat_rel,vector_rel_origin):
     return (R@BJ_stat_rel+vector_rel_origin)                             
 
 def upper_front(theta_U,k_U,BJ_stat_rel,vector_rel_origin):
-    UBJ_curr=(rodrigues_front(theta_U,k_U,BJ_stat_rel)+vector_rel_origin)
+    UBJ_curr=(rodrigues_front(theta_U,k_U,BJ_stat_rel,vector_rel_origin))
     return UBJ_curr                               
 
 def lower_front(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_lower_side,seed,bracket):
@@ -96,3 +96,42 @@ def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector
     M2=np.array([e1_curr,e2_curr,e3_curr])
 
     return (((M2.T)@(M1)@vector_rel_lbj)+LBJ_curr)
+
+seed1=0.0
+def seeder(UBJ_stat,LBJ_stat,TRO_stat):
+    
+    kp_static=(UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat))
+    v_static=(TRO_stat-LBJ_stat)
+    component=(np.dot(v_static,kp_static))
+    radius=np.linalg.norm(v_static-(component*kp_static))
+    
+    tmp=np.array([1,0,0])
+    x=(tmp-((np.dot(tmp,kp_static))/np.linalg.norm(kp_static))*kp_static)  
+    e1=(x/np.linalg.norm(x))
+    a=(v_static-component*kp_static)
+    y=((np.dot(a,e1))/((np.linalg.norm(a))*(np.linalg.norm(e1))))
+    z=np.arccos(y)
+    return z
+
+seed2=seeder(dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'])
+seed3=0.0
+
+for z in range(1,26,1):
+    def WC(theta_U):
+        UBJ_stat_rel=dict_FL['UBJ']-dict_FL['UF']
+        UBJ_curr=upper_front(theta_U,k_U_Left,UBJ_stat_rel,dict_FL['UF'])
+        LBJ_curr=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1,0.05)
+        TRO_curr=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2,0.1)
+        return ((triad_transform(UBJ_curr,LBJ_curr,TRO_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],(dict_FL['WC']-dict_FL['LBJ']))[2]-dict_FL['WC'][2])-z)
+    
+    try:
+        root=brentq(WC,seed3-0.1,seed3+0.1,xtol=1e-10)
+    except:
+        try:
+            root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
+        except:
+            raise ValueError(f"The geometry exceeded {seed3} limits")
+    
+    theta_U=root
+    print(theta_U)
+    quit()
