@@ -66,10 +66,6 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed):
     TRO_curr=tro_post(root,e1,e2,radius,centre_curr)
     return (TRO_curr,root)
 
-
-
-
-
 def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector_rel_lbj):
 
     e1_stat=(UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat))
@@ -84,7 +80,7 @@ def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector
     e3_curr=np.cross(e1_curr,e2_curr)
     M2=np.array([e1_curr,e2_curr,e3_curr])
 
-    return (((M2.T)@(M1)@vector_rel_lbj)+LBJ_curr)
+    return (((M2.T)@(M1)@vector_rel_lbj)+LBJ_curr)  
 
 seed1=0.0
 def seeder(UBJ_stat,LBJ_stat,TRO_stat):
@@ -105,7 +101,7 @@ seed2=seeder(dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'])
 
 seed3=0.0
 
-for z in range(1,26,1):
+for z in range(-25,26,1):
     def WC(theta_U):
         UBJ_stat_rel=dict_FL['UBJ']-dict_FL['UA']
         UBJ_curr=upper_front(theta_U,k_U_Left,UBJ_stat_rel,dict_FL['UA'])
@@ -113,17 +109,20 @@ for z in range(1,26,1):
         TRO_curr=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)[0]
         return ((triad_transform(UBJ_curr,LBJ_curr,TRO_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],(dict_FL['WC']-dict_FL['LBJ']))[2]-dict_FL['WC'][2])-z)
     try:
-        root=brentq(WC,seed3-0.1,seed3+0.1,xtol=1e-10)
+        root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
     except:
         try:
-            root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
+            root=brentq(WC,seed3-0.4,seed3+0.4,xtol=1e-10)
         except:
             raise ValueError(f"The geometry exceeded {seed3} limits")
     
-    seed3=root
+    seed3=root+(root-seed3)
     UBJ_stat_rel=dict_FL['UBJ']-dict_FL['UF']
     UBJ_curr=upper_front(root,k_U_Left,UBJ_stat_rel,dict_FL['UF'])
-    seed1=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[1]
+    seed1=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[1] + (lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[1]-seed1)
     LBJ_curr=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[0]
-    seed2=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)[1]
-    print(root)
+    seed2=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)[1] + (tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)[1]-seed2)
+    
+    K=(UBJ_curr-LBJ_curr)
+    caster=np.arctan2(-K[0],K[2])
+    print(caster*(180/np.pi))
