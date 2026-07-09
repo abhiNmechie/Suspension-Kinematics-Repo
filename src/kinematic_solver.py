@@ -3,6 +3,7 @@ import pandas as pd
 import scipy as sp
 from scipy.optimize import brentq
 from scipy.optimize import fsolve
+from scipy.optimize import root_scalar
 from hardpoint_io import dict_FL, dict_FR,d1,d2,d3,k_U_Left,k_L_Left
 
 def rodrigues_front(theta,k,BJ_stat_rel,vector_rel_origin):
@@ -100,7 +101,7 @@ def seeder(UBJ_stat,LBJ_stat,TRO_stat):
 seed2=seeder(dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'])
 
 seed3=0.0
-
+seed4=0.0
 for z in range(-25,26,1):
     def WC(theta_U):
         UBJ_stat_rel=dict_FL['UBJ']-dict_FL['UA']
@@ -119,10 +120,24 @@ for z in range(-25,26,1):
     seed3=root+(root-seed3)
     UBJ_stat_rel=dict_FL['UBJ']-dict_FL['UF']
     UBJ_curr=upper_front(root,k_U_Left,UBJ_stat_rel,dict_FL['UF'])
-    seed1=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[1] + (lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[1]-seed1)
-    LBJ_curr=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)[0]
-    seed2=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)[1] + (tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)[1]-seed2)
+
+    result_LOWER=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)
+    seed1=(result_LOWER[1]+(result_LOWER[1]-seed1))
+    LBJ_curr=result_LOWER[0]
+
+    result_TIE=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)
+    seed2=(result_TIE[1]+(result_TIE[1]-seed2))
+    TRO_curr=result_TIE[0]
+
+    PRO_curr=rodrigues_front(root,k_U_Left,(dict_FL['PRO']-dict_FL['UA']),dict_FL['UA'])
+
+    def residual(alpha):
+        k_rocker=((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2']))
+        return (np.linalg.norm((rodrigues_front(alpha,k_rocker,(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2']))-PRO_curr)-d3)
     
-    K=(UBJ_curr-LBJ_curr)
-    caster=np.arctan2(-K[0],K[2])
-    print(caster*(180/np.pi))
+    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
+    root2=sol.root
+    seed4=root2+(root2-seed4)
+    PRI_curr=rodrigues_front(root2,((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2'])),(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2'])
+    RD_curr=triad_transform(PRI_curr,dict_FL['RPA1'],dict_FL['RPA2'],dict_FL['PRI'],dict_FL['RPA1'],dict_FL['RPA2'],(dict_FL['RD']-dict_FL['RPA1']))
+    print(RD_curr)
