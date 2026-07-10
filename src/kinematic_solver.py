@@ -84,7 +84,7 @@ def seeder(UBJ_stat,LBJ_stat,TRO_stat):
     e2=np.cross(kp_static,e1)
     return np.arctan2((np.dot(a,e2)),(np.dot(a,e1)))
 
-#front left(FL):
+# front left
 seed1=0.0
 seed2=seeder(dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'])
 seed3=0.0
@@ -181,7 +181,7 @@ for z in range(-1,-26,-1):
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
 
 print('\n')
-#FRONT RIGHT
+# front right
 seed1=0.0
 seed2=seeder(dict_FR['UBJ'],dict_FR['LBJ'],dict_FR['TRO'])
 seed3=0.0
@@ -276,7 +276,7 @@ for z in range(-1,-26,-1):
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
 
 
-#REAR LEFT
+# rear left
 seed1=0.0
 seed2=seeder(dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'])
 seed3=0.0
@@ -324,10 +324,8 @@ for z in range(1,26,1):
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
     print(caster)
 
-
 print('\n')
 
-#REAR LEFT
 seed1=0.0
 seed2=seeder(dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'])
 seed3=0.0
@@ -377,7 +375,7 @@ for z in range(-1,-26,-1):
 
 print('\n')
 
-#REAR RIGHT
+#rear right
 seed1=0.0
 seed2=seeder(dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'])
 seed3=0.0
@@ -425,10 +423,8 @@ for z in range(1,26,1):
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
     print(caster)
 
-
 print('\n')
 
-#REAR RIGHT
 seed1=0.0
 seed2=seeder(dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'])
 seed3=0.0
