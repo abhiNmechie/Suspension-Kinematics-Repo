@@ -130,7 +130,6 @@ for z in range(1,26,1):
 
     kingpin=(FL_UBJ_curr-FL_LBJ_curr)
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
-    print(caster)
 
 
 print('\n')
@@ -180,7 +179,6 @@ for z in range(-1,-26,-1):
 
     kingpin=(FL_UBJ_curr-FL_LBJ_curr)
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
-    print(caster)
 
 print('\n')
 #FRONT RIGHT
@@ -229,7 +227,6 @@ for z in range(1,26,1):
 
     kingpin=(FL_UBJ_curr-FL_LBJ_curr)
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
-    print(caster)
 
 print('\n')
 seed1=0.0
@@ -276,5 +273,205 @@ for z in range(-1,-26,-1):
     FL_RD_curr=triad_transform(FL_PRI_curr,dict_FL['RPA1'],dict_FL['RPA2'],dict_FL['PRI'],dict_FL['RPA1'],dict_FL['RPA2'],(dict_FL['RD']-dict_FL['RPA1']))   ##rd_cur
 
     kingpin=(FL_UBJ_curr-FL_LBJ_curr)
+    caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
+
+
+#REAR LEFT
+seed1=0.0
+seed2=seeder(dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'])
+seed3=0.0
+seed4=0.0
+for z in range(1,26,1):
+    def WC(theta_U):
+        UBJ_stat_rel=dict_RL['UBJ']-dict_RL['UA']
+        RL_UBJ_curr=upper(theta_U,RL_k_U,UBJ_stat_rel,dict_RL['UA'])
+        RL_LBJ_curr=lower(RL_UBJ_curr,(dict_RL['LBJ']-dict_RL['LA']),dict_RL['LA'],RL_k_L,seed1,RL_d1)[0]
+        RL_TRO_curr=tierod(RL_UBJ_curr,RL_LBJ_curr,dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'],dict_RL['TRI'],seed2,RL_d2)[0]
+        return ((triad_transform(RL_UBJ_curr,RL_LBJ_curr,RL_TRO_curr,dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'],(dict_RL['WC']-dict_RL['LBJ']))[2]-dict_RL['WC'][2])-z)
+    try:
+        root=brentq(WC,seed3-0.1,seed3+0.1,xtol=1e-10)
+    except ValueError:
+        try:
+            root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
+        except:
+            raise ValueError(f"The geometry exceeded {seed3} limits")
+    
+    seed3=root+(root-seed3)
+    RL_UBJ_stat_rel=dict_RL['UBJ']-dict_RL['UF']
+    RL_UBJ_curr=upper(root,RL_k_U,RL_UBJ_stat_rel,dict_RL['UF'])  #ubj_curr exfil
+
+    RL_result_LOWER=lower(RL_UBJ_curr,(dict_RL['LBJ']-dict_RL['LA']),dict_RL['LA'],RL_k_L,seed1,RL_d1)
+    seed1=(RL_result_LOWER[1]+(RL_result_LOWER[1]-seed1))
+    RL_LBJ_curr=RL_result_LOWER[0]                                        #lbj_curr exfil
+
+    RL_result_TIE=tierod(RL_UBJ_curr,RL_LBJ_curr,dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'],dict_RL['TRI'],seed2,RL_d2)
+    seed2=(RL_result_TIE[1]+(RL_result_TIE[1]-seed2))
+    RL_TRO_curr=RL_result_TIE[0]                                          #tro_curr exfil
+
+    RL_PRO_curr=rodrigues(root,RL_k_U,(dict_RL['PRO']-dict_RL['UA']),dict_RL['UA'])  #pro_curr exfil
+
+    def residual(alpha):
+        k_rocker=((dict_RL['RPA1']-dict_RL['RPA2'])/np.linalg.norm(dict_RL['RPA1']-dict_RL['RPA2']))
+        return (np.linalg.norm((rodrigues(alpha,k_rocker,(dict_RL['PRI']-dict_RL['RPA2']),dict_RL['RPA2']))-RL_PRO_curr)-RL_d3)
+    
+    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
+    root2=sol.root 
+    seed4=root2+(root2-seed4)
+    RL_PRI_curr=rodrigues(root2,((dict_RL['RPA1']-dict_RL['RPA2'])/np.linalg.norm(dict_RL['RPA1']-dict_RL['RPA2'])),(dict_RL['PRI']-dict_RL['RPA2']),dict_RL['RPA2'])  #pri_curr
+    RL_RD_curr=triad_transform(RL_PRI_curr,dict_RL['RPA1'],dict_RL['RPA2'],dict_RL['PRI'],dict_RL['RPA1'],dict_RL['RPA2'],(dict_RL['RD']-dict_RL['RPA1']))   ##rd_cur
+
+    kingpin=(RL_UBJ_curr-RL_LBJ_curr)
+    caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
+    print(caster)
+
+
+print('\n')
+
+#REAR LEFT
+seed1=0.0
+seed2=seeder(dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'])
+seed3=0.0
+seed4=0.0
+for z in range(-1,-26,-1):
+    def WC(theta_U):
+        UBJ_stat_rel=dict_RL['UBJ']-dict_RL['UA']
+        RL_UBJ_curr=upper(theta_U,RL_k_U,UBJ_stat_rel,dict_RL['UA'])
+        RL_LBJ_curr=lower(RL_UBJ_curr,(dict_RL['LBJ']-dict_RL['LA']),dict_RL['LA'],RL_k_L,seed1,RL_d1)[0]
+        RL_TRO_curr=tierod(RL_UBJ_curr,RL_LBJ_curr,dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'],dict_RL['TRI'],seed2,RL_d2)[0]
+        return ((triad_transform(RL_UBJ_curr,RL_LBJ_curr,RL_TRO_curr,dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'],(dict_RL['WC']-dict_RL['LBJ']))[2]-dict_RL['WC'][2])-z)
+    try:
+        root=brentq(WC,seed3-0.1,seed3+0.1,xtol=1e-10)
+    except ValueError:
+        try:
+            root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
+        except:
+            raise ValueError(f"The geometry exceeded {seed3} limits")
+    
+    seed3=root+(root-seed3)
+    RL_UBJ_stat_rel=dict_RL['UBJ']-dict_RL['UF']
+    RL_UBJ_curr=upper(root,RL_k_U,RL_UBJ_stat_rel,dict_RL['UF'])  #ubj_curr exfil
+
+    RL_result_LOWER=lower(RL_UBJ_curr,(dict_RL['LBJ']-dict_RL['LA']),dict_RL['LA'],RL_k_L,seed1,RL_d1)
+    seed1=(RL_result_LOWER[1]+(RL_result_LOWER[1]-seed1))
+    RL_LBJ_curr=RL_result_LOWER[0]                                        #lbj_curr exfil
+
+    RL_result_TIE=tierod(RL_UBJ_curr,RL_LBJ_curr,dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'],dict_RL['TRI'],seed2,RL_d2)
+    seed2=(RL_result_TIE[1]+(RL_result_TIE[1]-seed2))
+    RL_TRO_curr=RL_result_TIE[0]                                          #tro_curr exfil
+
+    RL_PRO_curr=rodrigues(root,RL_k_U,(dict_RL['PRO']-dict_RL['UA']),dict_RL['UA'])  #pro_curr exfil
+
+    def residual(alpha):
+        k_rocker=((dict_RL['RPA1']-dict_RL['RPA2'])/np.linalg.norm(dict_RL['RPA1']-dict_RL['RPA2']))
+        return (np.linalg.norm((rodrigues(alpha,k_rocker,(dict_RL['PRI']-dict_RL['RPA2']),dict_RL['RPA2']))-RL_PRO_curr)-RL_d3)
+    
+    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
+    root2=sol.root 
+    seed4=root2+(root2-seed4)
+    RL_PRI_curr=rodrigues(root2,((dict_RL['RPA1']-dict_RL['RPA2'])/np.linalg.norm(dict_RL['RPA1']-dict_RL['RPA2'])),(dict_RL['PRI']-dict_RL['RPA2']),dict_RL['RPA2'])  #pri_curr
+    RL_RD_curr=triad_transform(RL_PRI_curr,dict_RL['RPA1'],dict_RL['RPA2'],dict_RL['PRI'],dict_RL['RPA1'],dict_RL['RPA2'],(dict_RL['RD']-dict_RL['RPA1']))   ##rd_cur
+
+    kingpin=(RL_UBJ_curr-RL_LBJ_curr)
+    caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
+    print(caster)
+
+print('\n')
+
+#REAR RIGHT
+seed1=0.0
+seed2=seeder(dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'])
+seed3=0.0
+seed4=0.0
+for z in range(1,26,1):
+    def WC(theta_U):
+        UBJ_stat_rel=dict_RR['UBJ']-dict_RR['UA']
+        RR_UBJ_curr=upper(theta_U,RR_k_U,UBJ_stat_rel,dict_RR['UA'])
+        RR_LBJ_curr=lower(RR_UBJ_curr,(dict_RR['LBJ']-dict_RR['LA']),dict_RR['LA'],RR_k_L,seed1,RR_d1)[0]
+        RR_TRO_curr=tierod(RR_UBJ_curr,RR_LBJ_curr,dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'],dict_RR['TRI'],seed2,RR_d2)[0]
+        return ((triad_transform(RR_UBJ_curr,RR_LBJ_curr,RR_TRO_curr,dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'],(dict_RR['WC']-dict_RR['LBJ']))[2]-dict_RR['WC'][2])-z)
+    try:
+        root=brentq(WC,seed3-0.1,seed3+0.1,xtol=1e-10)
+    except ValueError:
+        try:
+            root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
+        except:
+            raise ValueError(f"The geometry exceeded {seed3} limits")
+    
+    seed3=root+(root-seed3)
+    RR_UBJ_stat_rel=dict_RR['UBJ']-dict_RR['UF']
+    RR_UBJ_curr=upper(root,RR_k_U,RR_UBJ_stat_rel,dict_RR['UF'])  #ubj_curr exfil
+
+    RR_result_LOWER=lower(RR_UBJ_curr,(dict_RR['LBJ']-dict_RR['LA']),dict_RR['LA'],RR_k_L,seed1,RR_d1)
+    seed1=(RR_result_LOWER[1]+(RR_result_LOWER[1]-seed1))
+    RR_LBJ_curr=RR_result_LOWER[0]                                        #lbj_curr exfil
+
+    RR_result_TIE=tierod(RR_UBJ_curr,RR_LBJ_curr,dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'],dict_RR['TRI'],seed2,RR_d2)
+    seed2=(RR_result_TIE[1]+(RR_result_TIE[1]-seed2))
+    RR_TRO_curr=RR_result_TIE[0]                                          #tro_curr exfil
+
+    RR_PRO_curr=rodrigues(root,RR_k_U,(dict_RR['PRO']-dict_RR['UA']),dict_RR['UA'])  #pro_curr exfil
+
+    def residual(alpha):
+        k_rocker=((dict_RR['RPA1']-dict_RR['RPA2'])/np.linalg.norm(dict_RR['RPA1']-dict_RR['RPA2']))
+        return (np.linalg.norm((rodrigues(alpha,k_rocker,(dict_RR['PRI']-dict_RR['RPA2']),dict_RR['RPA2']))-RR_PRO_curr)-RR_d3)
+    
+    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
+    root2=sol.root 
+    seed4=root2+(root2-seed4)
+    RR_PRI_curr=rodrigues(root2,((dict_RR['RPA1']-dict_RR['RPA2'])/np.linalg.norm(dict_RR['RPA1']-dict_RR['RPA2'])),(dict_RR['PRI']-dict_RR['RPA2']),dict_RR['RPA2'])  #pri_curr
+    RR_RD_curr=triad_transform(RR_PRI_curr,dict_RR['RPA1'],dict_RR['RPA2'],dict_RR['PRI'],dict_RR['RPA1'],dict_RR['RPA2'],(dict_RR['RD']-dict_RR['RPA1']))   ##rd_cur
+
+    kingpin=(RR_UBJ_curr-RR_LBJ_curr)
+    caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
+    print(caster)
+
+
+print('\n')
+
+#REAR RIGHT
+seed1=0.0
+seed2=seeder(dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'])
+seed3=0.0
+seed4=0.0
+for z in range(-1,-26,-1):
+    def WC(theta_U):
+        UBJ_stat_rel=dict_RR['UBJ']-dict_RR['UA']
+        RR_UBJ_curr=upper(theta_U,RR_k_U,UBJ_stat_rel,dict_RR['UA'])
+        RR_LBJ_curr=lower(RR_UBJ_curr,(dict_RR['LBJ']-dict_RR['LA']),dict_RR['LA'],RR_k_L,seed1,RR_d1)[0]
+        RR_TRO_curr=tierod(RR_UBJ_curr,RR_LBJ_curr,dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'],dict_RR['TRI'],seed2,RR_d2)[0]
+        return ((triad_transform(RR_UBJ_curr,RR_LBJ_curr,RR_TRO_curr,dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'],(dict_RR['WC']-dict_RR['LBJ']))[2]-dict_RR['WC'][2])-z)
+    try:
+        root=brentq(WC,seed3-0.1,seed3+0.1,xtol=1e-10)
+    except ValueError:
+        try:
+            root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
+        except:
+            raise ValueError(f"The geometry exceeded {seed3} limits")
+    
+    seed3=root+(root-seed3)
+    RR_UBJ_stat_rel=dict_RR['UBJ']-dict_RR['UF']
+    RR_UBJ_curr=upper(root,RR_k_U,RR_UBJ_stat_rel,dict_RR['UF'])  #ubj_curr exfil
+
+    RR_result_LOWER=lower(RR_UBJ_curr,(dict_RR['LBJ']-dict_RR['LA']),dict_RR['LA'],RR_k_L,seed1,RR_d1)
+    seed1=(RR_result_LOWER[1]+(RR_result_LOWER[1]-seed1))
+    RR_LBJ_curr=RR_result_LOWER[0]                                        #lbj_curr exfil
+
+    RR_result_TIE=tierod(RR_UBJ_curr,RR_LBJ_curr,dict_RR['UBJ'],dict_RR['LBJ'],dict_RR['TRO'],dict_RR['TRI'],seed2,RR_d2)
+    seed2=(RR_result_TIE[1]+(RR_result_TIE[1]-seed2))
+    RR_TRO_curr=RR_result_TIE[0]                                          #tro_curr exfil
+
+    RR_PRO_curr=rodrigues(root,RR_k_U,(dict_RR['PRO']-dict_RR['UA']),dict_RR['UA'])  #pro_curr exfil
+
+    def residual(alpha):
+        k_rocker=((dict_RR['RPA1']-dict_RR['RPA2'])/np.linalg.norm(dict_RR['RPA1']-dict_RR['RPA2']))
+        return (np.linalg.norm((rodrigues(alpha,k_rocker,(dict_RR['PRI']-dict_RR['RPA2']),dict_RR['RPA2']))-RR_PRO_curr)-RR_d3)
+    
+    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
+    root2=sol.root 
+    seed4=root2+(root2-seed4)
+    RR_PRI_curr=rodrigues(root2,((dict_RR['RPA1']-dict_RR['RPA2'])/np.linalg.norm(dict_RR['RPA1']-dict_RR['RPA2'])),(dict_RR['PRI']-dict_RR['RPA2']),dict_RR['RPA2'])  #pri_curr
+    RR_RD_curr=triad_transform(RR_PRI_curr,dict_RR['RPA1'],dict_RR['RPA2'],dict_RR['PRI'],dict_RR['RPA1'],dict_RR['RPA2'],(dict_RR['RD']-dict_RR['RPA1']))   ##rd_cur
+
+    kingpin=(RR_UBJ_curr-RR_LBJ_curr)
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
     print(caster)
