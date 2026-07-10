@@ -1,6 +1,3 @@
-#harpoint naming convention
-#RULE: "CORNER_SYMBOL_AXIS"
-#CORNERS: {FL, FR, RL, RR}
 #SYMBOL:
 # 1)UA: UPPER WISHBONE AFT (WISHBONE CHASSIS)
 # 2)UF: UPPER WISHBONE FORE (WISHBONE CHASSIS)
@@ -24,6 +21,7 @@ import pandas as pd
 
 np.set_printoptions(suppress=True, precision=3)
 
+#FRONT SUSPENSION HARDPOINTS
 frontsus_df=pd.read_csv(r"C:\PROGRAMMING\Codes\SUSPENSION KINEMATICS SIMULATOR\CODE REPOSITORY\data\frontsusFINAL2.txt")
 frontsus_df.set_index('LABEL',inplace=True)
 
@@ -49,7 +47,7 @@ dict_FL={
 }
 for k,v in dict_FL.items():
     temp=frontsus_df.loc[k,['X','Y','Z']].values
-    temp=(np.array([[-1,0,0],[0,1,0],[0,0,1]]@temp))
+    temp=(np.array([[-1,0,0],[0,1,0],[0,0,1]])@temp)
     temp[0]=temp[0]+1000
     dict_FL[k]=temp
 
@@ -77,10 +75,85 @@ dict_FR={
 for k,v in dict_FL.items():
     dict_FR[k]=(np.array([[1,0,0],[0,-1,0],[0,0,1]])@v)
 
-k_U_Left=(dict_FL['UF']-dict_FL['UA'])/(np.linalg.norm(dict_FL['UF']-dict_FL['UA']))
-k_L_Left=k_L=(dict_FL['LF']-dict_FL['LA'])/(np.linalg.norm(dict_FL['LF']-dict_FL['LA']))
-d1=np.linalg.norm(dict_FL['UBJ']-dict_FL['LBJ'])
-d2=np.linalg.norm(dict_FL['TRO']-dict_FL['TRI'])
-d3=np.linalg.norm(dict_FL['PRO']-dict_FL['PRI'])
+#FRONT LEFT CONSTANTS
+FL_k_U=(dict_FL['UF']-dict_FL['UA'])/(np.linalg.norm(dict_FL['UF']-dict_FL['UA']))
+FL_k_L=(dict_FL['LF']-dict_FL['LA'])/(np.linalg.norm(dict_FL['LF']-dict_FL['LA']))
+FL_d1=np.linalg.norm(dict_FL['UBJ']-dict_FL['LBJ'])
+FL_d2=np.linalg.norm(dict_FL['TRO']-dict_FL['TRI'])
+FL_d3=np.linalg.norm(dict_FL['PRO']-dict_FL['PRI'])
 
-print(dict_FL['TRO'])
+#FRONT RIGHT CONSTANTS
+FR_k_U=(dict_FR['UF']-dict_FR['UA'])/(np.linalg.norm(dict_FR['UF']-dict_FR['UA']))
+FR_k_L=(dict_FR['LF']-dict_FR['LA'])/(np.linalg.norm(dict_FR['LF']-dict_FR['LA']))
+FR_d1=np.linalg.norm(dict_FR['UBJ']-dict_FR['LBJ'])
+FR_d2=np.linalg.norm(dict_FR['TRO']-dict_FR['TRI'])
+FR_d3=np.linalg.norm(dict_FR['PRO']-dict_FR['PRI'])
+
+#REAR SUSPENSION 
+rearsus_df=pd.read_csv(r"C:\PROGRAMMING\Codes\SUSPENSION KINEMATICS SIMULATOR\CODE REPOSITORY\data\REARSUSP.csv")
+rearsus_df.set_index('LABEL',inplace=True)
+
+dict_RL=dict()
+dict_RL={
+    'LF':np.empty(3),
+    'LA':np.empty(3),
+    'LBJ':np.empty(3),
+    'UF':np.empty(3),
+    'UA':np.empty(3),
+    'UBJ':np.empty(3),
+    'PRO':np.empty(3),
+    'PRI':np.empty(3),
+    'TRO':np.empty(3),
+    'TRI':np.empty(3),
+    'DC':np.empty(3),
+    'RD':np.empty(3),
+    'WC':np.empty(3),
+    'RPA1':np.empty(3),
+    'RPA2':np.empty(3),
+    'CP':np.empty(3),
+    'WSP':np.empty(3)
+}
+
+for k,v in dict_RL.items():
+    temp=rearsus_df.loc[k,['X','Y','Z']].values
+    temp=(np.array([[-1,0,0],[0,1,0],[0,0,1]])@(temp))
+    temp[0]=temp[0]+1000
+    dict_RL[k]=temp
+
+dict_RR=dict()
+dict_RR={
+    'LF':np.empty(3),
+    'LA':np.empty(3),
+    'LBJ':np.empty(3),
+    'UF':np.empty(3),
+    'UA':np.empty(3),
+    'UBJ':np.empty(3),
+    'PRO':np.empty(3),
+    'PRI':np.empty(3),
+    'TRO':np.empty(3),
+    'TRI':np.empty(3),
+    'DC':np.empty(3),
+    'RD':np.empty(3),
+    'WC':np.empty(3),
+    'RPA1':np.empty(3),
+    'RPA2':np.empty(3),
+    'CP':np.empty(3),
+    'WSP':np.empty(3)
+}
+
+for k,v in dict_RL.items():
+    dict_RR[k]=(np.array([[1,0,0],[0,-1,0],[0,0,1]])@v)
+
+#REAR LEFT CONSTANTS
+RL_k_U=(dict_RL['UF']-dict_RL['UA'])/(np.linalg.norm(dict_RL['UF']-dict_RL['UA']))
+RL_k_L=(dict_RL['LF']-dict_RL['LA'])/(np.linalg.norm(dict_RL['LF']-dict_RL['LA']))
+RL_d1=np.linalg.norm(dict_RL['UBJ']-dict_RL['LBJ'])
+RL_d2=np.linalg.norm(dict_RL['TRO']-dict_RL['TRI'])
+RL_d3=np.linalg.norm(dict_RL['PRO']-dict_RL['PRI'])
+
+#REAR RIGHT CONSTANTS
+RR_k_U=(dict_RR['UF']-dict_RR['UA'])/(np.linalg.norm(dict_RR['UF']-dict_RR['UA']))
+RR_k_L=(dict_RR['LF']-dict_RR['LA'])/(np.linalg.norm(dict_RR['LF']-dict_RR['LA']))
+RR_d1=np.linalg.norm(dict_RR['UBJ']-dict_RR['LBJ'])
+RR_d2=np.linalg.norm(dict_RR['TRO']-dict_RR['TRI'])
+RR_d3=np.linalg.norm(dict_RR['PRO']-dict_RR['PRI'])
