@@ -276,7 +276,7 @@ for z in range(-1,-26,-1):
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
 
 
-# rear left
+# rear left super symmetrical h to the org so itna grind nahi krna
 seed1=0.0
 seed2=seeder(dict_RL['UBJ'],dict_RL['LBJ'],dict_RL['TRO'])
 seed3=0.0
@@ -446,7 +446,7 @@ for z in range(-1,-26,-1):
     
     seed3=root+(root-seed3)
     RR_UBJ_stat_rel=dict_RR['UBJ']-dict_RR['UF']
-    RR_UBJ_curr=upper(root,RR_k_U,RR_UBJ_stat_rel,dict_RR['UF'])  #ubj_curr exfil
+    RR_UBJ_curr=upper(root,RR_k_U,RR_UBJ_stat_rel,dict_RR['UF'])  #ubj_curr exfil ho rha h 
 
     RR_result_LOWER=lower(RR_UBJ_curr,(dict_RR['LBJ']-dict_RR['LA']),dict_RR['LA'],RR_k_L,seed1,RR_d1)
     seed1=(RR_result_LOWER[1]+(RR_result_LOWER[1]-seed1))
