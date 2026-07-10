@@ -119,27 +119,27 @@ for z in range(1,26,1):
     
     seed3=root+(root-seed3)
     UBJ_stat_rel=dict_FL['UBJ']-dict_FL['UF']
-    UBJ_curr=upper_front(root,k_U_Left,UBJ_stat_rel,dict_FL['UF'])
+    UBJ_curr=upper_front(root,k_U_Left,UBJ_stat_rel,dict_FL['UF'])  #ubj_curr exfil
 
     result_LOWER=lower_front(UBJ_curr,(dict_FL['LBJ']-dict_FL['LF']),dict_FL['LF'],k_L_Left,seed1)
     seed1=(result_LOWER[1]+(result_LOWER[1]-seed1))
-    LBJ_curr=result_LOWER[0]
+    LBJ_curr=result_LOWER[0]                                        #lbj_curr exfil
 
     result_TIE=tierod(UBJ_curr,LBJ_curr,dict_FL['UBJ'],dict_FL['LBJ'],dict_FL['TRO'],seed2)
     seed2=(result_TIE[1]+(result_TIE[1]-seed2))
-    TRO_curr=result_TIE[0]
+    TRO_curr=result_TIE[0]                                          #tro_curr exfil
 
-    PRO_curr=rodrigues_front(root,k_U_Left,(dict_FL['PRO']-dict_FL['UA']),dict_FL['UA'])
+    PRO_curr=rodrigues_front(root,k_U_Left,(dict_FL['PRO']-dict_FL['UA']),dict_FL['UA'])  #pro_curr exfil
 
     def residual(alpha):
         k_rocker=((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2']))
         return (np.linalg.norm((rodrigues_front(alpha,k_rocker,(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2']))-PRO_curr)-d3)
     
     sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
-    root2=sol.root
+    root2=sol.root 
     seed4=root2+(root2-seed4)
-    PRI_curr=rodrigues_front(root2,((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2'])),(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2'])
-    RD_curr=triad_transform(PRI_curr,dict_FL['RPA1'],dict_FL['RPA2'],dict_FL['PRI'],dict_FL['RPA1'],dict_FL['RPA2'],(dict_FL['RD']-dict_FL['RPA1']))
+    PRI_curr=rodrigues_front(root2,((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2'])),(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2'])  #pri_curr
+    RD_curr=triad_transform(PRI_curr,dict_FL['RPA1'],dict_FL['RPA2'],dict_FL['PRI'],dict_FL['RPA1'],dict_FL['RPA2'],(dict_FL['RD']-dict_FL['RPA1']))   ##rd_cur
 
     kingpin=(UBJ_curr-LBJ_curr)
     caster=(180/np.pi)*(np.arctan2(-kingpin[0],kingpin[2]))
@@ -185,8 +185,8 @@ for z in range(-1,-26,-1):
         k_rocker=((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2']))
         return (np.linalg.norm((rodrigues_front(alpha,k_rocker,(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2']))-PRO_curr)-d3)
     
-    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant')
+    sol=root_scalar(residual,x0=seed4,x1=seed4+1e-6,method='secant') 
     root2=sol.root
     seed4=root2+(root2-seed4)
-    PRI_curr=rodrigues_front(root2,((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2'])),(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2'])
-    RD_curr=triad_transform(PRI_curr,dict_FL['RPA1'],dict_FL['RPA2'],dict_FL['PRI'],dict_FL['RPA1'],dict_FL['RPA2'],(dict_FL['RD']-dict_FL['RPA1']))
+    PRI_curr=rodrigues_front(root2,((dict_FL['RPA1']-dict_FL['RPA2'])/np.linalg.norm(dict_FL['RPA1']-dict_FL['RPA2'])),(dict_FL['PRI']-dict_FL['RPA2']),dict_FL['RPA2'])  #pri_curr
+    RD_curr=triad_transform(PRI_curr,dict_FL['RPA1'],dict_FL['RPA2'],dict_FL['PRI'],dict_FL['RPA1'],dict_FL['RPA2'],(dict_FL['RD']-dict_FL['RPA1']))  ##rd_curr
