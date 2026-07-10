@@ -4,24 +4,24 @@ import scipy as sp
 from scipy.optimize import brentq
 from scipy.optimize import fsolve
 from scipy.optimize import root_scalar
-from hardpoint_io import dict_FL, dict_FR,d1,d2,d3,k_U_Left,k_L_Left
+from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U
 
-def rodrigues_front(theta,k,BJ_stat_rel,vector_rel_origin):
+def rodrigues(theta,k,BJ_stat_rel,vector_rel_origin):
     Kx=np.array([[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]])
     Kx2=((Kx)@(Kx))
     I=np.eye(3)
     R=(I+(Kx*(np.sin(theta)))+(Kx2*(1-np.cos(theta))))
     return (R@BJ_stat_rel+vector_rel_origin)                             
 
-def upper_front(theta_U,k_U,BJ_stat_rel,vector_rel_origin):
-    UBJ_curr=(rodrigues_front(theta_U,k_U,BJ_stat_rel,vector_rel_origin))
+def upper(theta_U,k_U,BJ_stat_rel,vector_rel_origin):
+    UBJ_curr=(rodrigues(theta_U,k_U,BJ_stat_rel,vector_rel_origin))
     return UBJ_curr                               
 
-def lower_front(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_lower_side,seed):
+def lower(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_lower_side,seed,const_dist):
     def residual(theta_L):
-        return (np.linalg.norm(UBJ_curr-rodrigues_front(theta_L,k_lower_side,LBJ_stat_rel,vector_rel_origin))-d1)
+        return (np.linalg.norm(UBJ_curr-rodrigues(theta_L,k_lower_side,LBJ_stat_rel,vector_rel_origin))-const_dist)
     root=fsolve(residual,seed)[0]
-    LBJ_curr=rodrigues_front(root,k_L_Left,LBJ_stat_rel,vector_rel_origin)
+    LBJ_curr=rodrigues(root,k_lower_side,LBJ_stat_rel,vector_rel_origin)
     return (LBJ_curr,root)
 
 
