@@ -247,6 +247,3 @@ corner(dict_RL,out_dict_RL,RL_d1,RL_d2,RL_d3,RL_k_U,RL_k_L)
 corner(dict_RR,out_dict_RR,RR_d1,RR_d2,RR_d3,RR_k_U,RR_k_L)
 
 kp=(out_dict_FL['UBJ']-out_dict_FL['LBJ'])
-caster_array=np.zeros(51)
-for i in range (0,51,1): caster_array[i]=(180/np.pi)*(np.arctan2(-kp[i][0],kp[i][2]))
-print(caster_array)
