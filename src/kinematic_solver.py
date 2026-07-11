@@ -6,7 +6,33 @@ from scipy.optimize import fsolve
 from scipy.optimize import root_scalar
 from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U
 
-#BUMP-KINEMATICS SOLVER:
+#output dictionary containing array:
+#for front ledft:
+out_dict_FL=dict()
+for k,v in dict_FL.items():
+    out_dict_FL[k]=np.zeros((51,3))
+    out_dict_FL[k][25]=v
+
+#for front right:
+out_dict_FR=dict()
+for k,v in dict_FR.items():
+    out_dict_FR[k]=np.zeros((51,3))
+    out_dict_FR[k][25]=v
+
+#for rear left  :
+out_dict_RL=dict()
+for k,v in dict_RL.items():
+    out_dict_RL[k]=np.zeros((51,3))
+    out_dict_RL[k][25]=v
+
+#for rear right:
+out_dict_RR=dict()
+for k,v in dict_RR.items():
+    out_dict_RR[k]=np.zeros((51,3))
+    out_dict_RR[k][25]=v
+
+
+#BUMP SOLVER:
 def rodrigues(theta,k,BJ_stat_rel,vector_rel_origin):
     Kx=np.array([[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]])
     Kx2=((Kx)@(Kx))

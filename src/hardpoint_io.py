@@ -157,3 +157,5 @@ RR_k_L=(dict_RR['LF']-dict_RR['LA'])/(np.linalg.norm(dict_RR['LF']-dict_RR['LA']
 RR_d1=np.linalg.norm(dict_RR['UBJ']-dict_RR['LBJ'])
 RR_d2=np.linalg.norm(dict_RR['TRO']-dict_RR['TRI'])
 RR_d3=np.linalg.norm(dict_RR['PRO']-dict_RR['PRI'])
+
+print(dict_FL['UBJ'])
