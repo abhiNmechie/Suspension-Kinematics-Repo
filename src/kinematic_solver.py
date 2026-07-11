@@ -206,7 +206,7 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
 
         result_TIE=tierod(UBJ_curr,LBJ_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['TRI'],seed2,const_d2)
         seed2=(result_TIE[1]+(result_TIE[1]-seed2))
-        TRO_curr=result_TIE[0]                                          #tro_curr exfil
+        TRO_curr=result_TIE[0]                                          #tro_curr exfil1
         output_corner_dict['TRO'][index]=TRO_curr
 
         PRO_curr=rodrigues(root,corner_k_U,(input_corner_dict['PRO']-input_corner_dict['UA']),input_corner_dict['UA'])  #pro_curr exfil
