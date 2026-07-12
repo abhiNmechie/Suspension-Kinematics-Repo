@@ -5,7 +5,7 @@ from scipy.optimize import brentq
 from scipy.optimize import fsolve
 from scipy.optimize import root_scalar
 from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U
-np.set_printoptions(suppress=True, precision=5)
+np.set_printoptions(suppress=True, precision=8)
 
 #for front ledft:
 out_dict_FL=dict()
@@ -131,8 +131,6 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
             except:
                 raise ValueError(f"The geometry exceeded {seed3} limits")
         
-        WC_curr=WC(root)
-        output_corner_dict['WC'][index]=WC_curr  #wc_curr
         seed3=root+(root-seed3)
 
         UBJ_stat_rel=input_corner_dict['UBJ']-input_corner_dict['UF']
@@ -149,6 +147,9 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
         TRO_curr=result_TIE[0]                                          #tro_curr exfil
         output_corner_dict['TRO'][index]=TRO_curr
 
+        WC_curr=triad_transform(UBJ_curr,LBJ_curr,TRO_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],(input_corner_dict['WC']-input_corner_dict['LBJ']))
+        output_corner_dict['WC'][index]=WC_curr  #wc_curr
+        
         PRO_curr=rodrigues(root,corner_k_U,(input_corner_dict['PRO']-input_corner_dict['UA']),input_corner_dict['UA'])  #pro_curr exfil
         output_corner_dict['PRO'][index]=PRO_curr
 
@@ -190,9 +191,7 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
                 root=brentq(WC,seed3-0.2,seed3+0.2,xtol=1e-10)
             except:
                 raise ValueError(f"The geometry exceeded {seed3} limits")
-        
-        WC_curr=WC(root)
-        output_corner_dict['WC'][index]=WC_curr  #wc_curr
+            
         seed3=root+(root-seed3)
 
         UBJ_stat_rel=input_corner_dict['UBJ']-input_corner_dict['UF']
@@ -208,6 +207,10 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
         seed2=(result_TIE[1]+(result_TIE[1]-seed2))
         TRO_curr=result_TIE[0]                                          #tro_curr exfil1
         output_corner_dict['TRO'][index]=TRO_curr
+
+
+        WC_curr=triad_transform(UBJ_curr,LBJ_curr,TRO_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],(input_corner_dict['WC']-input_corner_dict['LBJ']))
+        output_corner_dict['WC'][index]=WC_curr  #wc_curr
 
         PRO_curr=rodrigues(root,corner_k_U,(input_corner_dict['PRO']-input_corner_dict['UA']),input_corner_dict['UA'])  #pro_curr exfil
         output_corner_dict['PRO'][index]=PRO_curr
@@ -244,6 +247,4 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
 corner(dict_FL,out_dict_FL,FL_d1,FL_d2,FL_d3,FL_k_U,FL_k_L)
 corner(dict_FR,out_dict_FR,FR_d1,FR_d2,FR_d3,FR_k_U,FR_k_L)
 corner(dict_RL,out_dict_RL,RL_d1,RL_d2,RL_d3,RL_k_U,RL_k_L)
-corner(dict_RR,out_dict_RR,RR_d1,RR_d2,RR_d3,RR_k_U,RR_k_L)
-
-kp=(out_dict_FL['UBJ']-out_dict_FL['LBJ'])
+corner(dict_RR,out_dict_RR,RR_d1,RR_d2,RR_d3,RR_k_U,RR_k_L) 

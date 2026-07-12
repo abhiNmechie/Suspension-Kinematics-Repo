@@ -158,4 +158,8 @@ RR_d1=np.linalg.norm(dict_RR['UBJ']-dict_RR['LBJ'])
 RR_d2=np.linalg.norm(dict_RR['TRO']-dict_RR['TRI'])
 RR_d3=np.linalg.norm(dict_RR['PRO']-dict_RR['PRI'])
 
-print(dict_FL['UBJ'])
+#static values of our car:
+front_static_camber=-1.6
+front_static_toe=0.0
+rear_static_camber=-1.4
+rear_static_toe=0.0
