@@ -163,3 +163,8 @@ front_static_camber=-1.6
 front_static_toe=0.0
 rear_static_camber=-1.4
 rear_static_toe=0.0
+
+#other gen values
+wheelbase=1650
+cog_height=285
+front_brake_bias=0.6

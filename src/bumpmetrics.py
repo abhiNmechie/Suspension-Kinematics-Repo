@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U,rear_static_camber,rear_static_toe,front_static_camber,front_static_toe
+from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U,rear_static_camber,rear_static_toe,front_static_camber,front_static_toe,wheelbase,front_brake_bias,cog_height
 from kinematic_solver import out_dict_FL, out_dict_FR,out_dict_RL,out_dict_RR
 
 def line_intersection(tup1,tup2,tup3,tup4):
@@ -72,5 +72,3 @@ for i in range(0,51,1):
     IC_2=line_intersection((out_dict_FR['UBJ'][i,1],out_dict_FR['UBJ'][i,2]),(R_upp_pointer[0],R_upp_pointer[1]),(out_dict_FR['LBJ'][i,1],out_dict_FR['LBJ'][i,2]),(R_low_pointer[0],R_low_pointer[1]))
 
     rc_arr[i]=line_intersection((out_dict_FL['CP'][i,1],out_dict_FL['CP'][i,2]),(IC_1[0],IC_1[1]),(out_dict_FR['CP'][i,1],out_dict_FR['CP'][i,2]),(IC_2[0],IC_2[1]))[1]
-
-#%anti_dive
