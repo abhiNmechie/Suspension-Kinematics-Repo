@@ -24,9 +24,12 @@ def line_intersection(tup1,tup2,tup3,tup4):
 #front:
 vect_front=(out_dict_FL['WC']-out_dict_FL['CP'])
 camber_front=np.degrees(np.arctan2(vect_front[:,1],vect_front[:,2]))+front_static_camber
+
 #rear
 vect_rear=(out_dict_RL['WC']-out_dict_RL['CP'])
 camber_rear=np.degrees(np.arctan2(vect_rear[:,1],vect_rear[:,2]))+rear_static_camber
+print(camber_front)
+
 
 #toe angle:
 #front
@@ -40,7 +43,7 @@ toe_rear=np.degrees(np.arctan2(vect_rear[:,1],vect_rear[:,0]))-90+rear_static_to
 #front:
 vect_front=(out_dict_FL['UBJ']-out_dict_FL['LBJ'])
 caster_front=np.degrees(np.arctan2(-vect_front[:,0],vect_front[:,2]))
-
+print(caster_front)
 #rear
 vect_rear=(out_dict_RL['UBJ']-out_dict_RL['LBJ'])
 caster_rear=np.degrees(np.arctan2(-vect_rear[:,0],vect_rear[:,2]))
@@ -52,6 +55,8 @@ kpi_front=np.degrees(np.arctan2(-vect_front[:,1],vect_front[:,2]))
 #rear
 vect_rear=(out_dict_RL['UBJ']-out_dict_RL['LBJ'])
 kpi_rear=np.degrees(np.arctan2(-vect_rear[:,1],vect_rear[:,2]))
+
+
 
 #rc_height
 def inter_pt(out_dict_corner,i,BJ,Fore,Aft):
@@ -72,3 +77,5 @@ for i in range(0,51,1):
     IC_2=line_intersection((out_dict_FR['UBJ'][i,1],out_dict_FR['UBJ'][i,2]),(R_upp_pointer[0],R_upp_pointer[1]),(out_dict_FR['LBJ'][i,1],out_dict_FR['LBJ'][i,2]),(R_low_pointer[0],R_low_pointer[1]))
 
     rc_arr[i]=line_intersection((out_dict_FL['CP'][i,1],out_dict_FL['CP'][i,2]),(IC_1[0],IC_1[1]),(out_dict_FR['CP'][i,1],out_dict_FR['CP'][i,2]),(IC_2[0],IC_2[1]))[1]
+
+print(rc_arr)

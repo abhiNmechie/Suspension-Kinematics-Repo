@@ -10,7 +10,7 @@ ax_list=axs.flatten()
 ax_list[0].plot(bump_travel,camber_front)
 ax_list[0].set_title("Front Camber")
 ax_list[0].set_xlabel("Bump Travel (mm)")
-ax_list[0].set_ylabel("Camber (deg)")
+ax_list[0].set_ylabel("Camber (deg)")             
 ax_list[0].grid(True)
 
 ax_list[1].plot(bump_travel,caster_front)

@@ -108,10 +108,7 @@ dict_RL={
     'DC':np.empty(3),
     'RD':np.empty(3),
     'WC':np.empty(3),
-    'RPA1':np.empty(3),
-    'RPA2':np.empty(3),
-    'CP':np.empty(3),
-    'WSP':np.empty(3)
+    'RP2SP':np.empty(3)
 }
 
 for k,v in dict_RL.items():
