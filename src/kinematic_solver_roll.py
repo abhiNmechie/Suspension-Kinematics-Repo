@@ -51,14 +51,13 @@ def lower(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_L,seed,const_dist):
     return (LBJ_curr,root)
 
 def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,TRI_stat,const_dict):
-    kp_stat=((UBJ_stat-LBJ_stat)/(np.linlag.norm(UBJ_stat-LBJ_stat)))
+    kp_stat=((UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat)))
     v_stat=(TRO_stat-LBJ_stat)
     centre_stat=(np.dot(v_stat,kp_stat)*kp_stat+LBJ_stat)
     radius=np.linalg.norm(v_stat-np.dot(v_stat,kp_stat)*kp_stat)
 
-    v_curr=(TRO_curr-LBJ_curr)
-    kp_curr=((UBJ_curr-LBJ_curr)/(np.linlag.norm(UBJ_curr-LBJ_curr)))
-    centre_curr=(np.dot(v_curr,kp_curr)*kp_curr+LBJ_curr)
+    kp_curr=((UBJ_curr-LBJ_curr)/(np.linalg.norm(UBJ_curr-LBJ_curr)))
+    centre_curr=(np.dot(v_stat,kp_stat)*kp_curr+LBJ_curr)
 
     vect_tmp=np.array([1,0,0])
     if np.dot(vect_tmp,kp_curr)>0.9 or np.dot(vect_tmp,kp_curr)<(-0.9):
@@ -90,12 +89,12 @@ def seeder(UBJ_stat,LBJ_stat,TRO_stat):
 def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector_stat):
     e1_stat=(UBJ_stat-LBJ_stat)/np.linalg.norm(UBJ_stat-LBJ_stat)
     v2_stat=(TRO_stat-LBJ_stat)/np.linalg.norm(TRO_stat-LBJ_stat)
-    e2_stat=((v2_stat-np.dot(v2_stat,e1_stat)*e1_stat)/np.linlag.norm(v2_stat-np.dot(v2_stat,e1_stat)*e1_stat))
+    e2_stat=((v2_stat-np.dot(v2_stat,e1_stat)*e1_stat)/np.linalg.norm(v2_stat-np.dot(v2_stat,e1_stat)*e1_stat))
     e3_stat=np.cross(e1_stat,e2_stat)
 
     e1_curr=(UBJ_curr-LBJ_curr)/np.linalg.norm(UBJ_curr-LBJ_curr)
     v2_curr=(TRO_curr-LBJ_curr)/np.linalg.norm(TRO_curr-LBJ_curr)
-    e2_curr=((v2_curr-np.dot(v2_curr,e1_curr)*e1_curr)/np.linlag.norm(v2_curr-np.dot(v2_curr,e1_curr)*e1_curr))
+    e2_curr=((v2_curr-np.dot(v2_curr,e1_curr)*e1_curr)/np.linalg.norm(v2_curr-np.dot(v2_curr,e1_curr)*e1_curr))
     e3_curr=np.cross(e1_curr,e2_curr)
 
     M1=np.array([e1_stat,e2_stat,e3_stat])
