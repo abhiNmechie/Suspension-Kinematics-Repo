@@ -76,3 +76,51 @@ def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector
     vector_rel_curr=(M.T)@(M)@(vector_rel_stat)
 
     return (vector_rel_curr+LBJ_curr)
+
+arr1=np.linspace(0,3,7)
+arr2=np.linspace(0,-3,7)
+
+#RC_Height_static:
+
+def cross_point(Fore,Aft,BJ):
+    v1=(BJ-Fore)
+    v2=(Aft-Fore)/np.linalg.norm(Aft-Fore)
+    v3=np.dot(v1,v2)*v2
+    return (v3+Fore)
+
+def solver_wishbones(Fore_1,Aft_1,BJ_1,Fore_2,Aft_2,BJ_2):
+    cross_pt_1=cross_point(Fore_1,Aft_1,BJ_1)
+    A=(cross_pt_1[2]-BJ_1[2])
+    B=(BJ_1[1]-cross_pt_1[1])
+    C=(-cross_pt_1[1]*BJ_1[2]+cross_pt_1[2]*BJ_1[1])
+
+    cross_pt_2=cross_point(Fore_2,Aft_2,BJ_2)
+    D=(cross_pt_2[2]-BJ_2[2])
+    E=(BJ_2[1]-cross_pt_2[1])
+    F=(-cross_pt_2[1]*BJ_2[2]+cross_pt_2[2]*BJ_2[1])
+
+    y=np.linalg.det(np.array([[C,B],[F,E]]))/np.linalg.det(np.array([[A,B],[D,E]]))
+    z=np.linalg.det(np.array([[A,C],[D,F]]))/np.linalg.det(np.array([[A,B],[D,E]]))
+
+    return (y,z)
+
+def solver_normal(pt_1,pt_2,pt_3,pt_4):   ##put pts in y,z
+    A=(pt_2[1]-pt_1[1])
+    B=(pt_1[0]-pt_2[0])
+    C=(-pt_2[0]*pt_1[1]+pt_2[1]*pt_1[0])
+
+    D=(pt_4[1]-pt_3[1])
+    E=(pt_3[0]-pt_4[0])
+    F=(-pt_4[0]*pt_3[1]+pt_4[1]*pt_3[0])
+
+    y=np.linalg.det(np.array([[C,B],[F,E]]))/np.linalg.det(np.array([[A,B],[D,E]]))
+    z=np.linalg.det(np.array([[A,C],[D,F]]))/np.linalg.det(np.array([[A,B],[D,E]]))
+
+    return (y,z)
+
+
+c1=solver_wishbones(dict_FL['UF'],dict_FL['UA'],dict_FL['UBJ'],dict_FL['LF'],dict_FL['LA'],dict_FL['LBJ'])
+c2=solver_wishbones(dict_FR['UF'],dict_FR['UA'],dict_FR['UBJ'],dict_FR['LF'],dict_FR['LA'],dict_FR['LBJ'])
+res=solver_normal(c1,(dict_FL['CP'][1],dict_FL['CP'][2]),c2,(dict_FR['CP'][1],dict_FR['CP'][2]))
+
+print(res[1])
