@@ -89,16 +89,19 @@ def seeder(UBJ_stat,LBJ_stat,TRO_stat):
 
 def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector_stat):
     e1_stat=(UBJ_stat-LBJ_stat)/np.linalg.norm(UBJ_stat-LBJ_stat)
-    e2_stat=(TRO_stat-LBJ_stat)/np.linalg.norm(TRO_stat-LBJ_stat)
+    v2_stat=(TRO_stat-LBJ_stat)/np.linalg.norm(TRO_stat-LBJ_stat)
+    e2_stat=((v2_stat-np.dot(v2_stat,e1_stat)*e1_stat)/np.linlag.norm(v2_stat-np.dot(v2_stat,e1_stat)*e1_stat))
     e3_stat=np.cross(e1_stat,e2_stat)
 
     e1_curr=(UBJ_curr-LBJ_curr)/np.linalg.norm(UBJ_curr-LBJ_curr)
-    e2_curr=(TRO_curr-LBJ_curr)/np.linalg.norm(TRO_curr-LBJ_curr)
+    v2_curr=(TRO_curr-LBJ_curr)/np.linalg.norm(TRO_curr-LBJ_curr)
+    e2_curr=((v2_curr-np.dot(v2_curr,e1_curr)*e1_curr)/np.linlag.norm(v2_curr-np.dot(v2_curr,e1_curr)*e1_curr))
     e3_curr=np.cross(e1_curr,e2_curr)
 
-    M=np.array([e1_stat,e2_stat,e3_stat])
+    M1=np.array([e1_stat,e2_stat,e3_stat])
+    M2=np.array([e1_curr,e2_curr,e3_curr])
     vector_rel_stat=(vector_stat-LBJ_stat)
-    vector_rel_curr=(M.T)@(M)@(vector_rel_stat)
+    vector_rel_curr=(M2.T)@(M1)@(vector_rel_stat)
 
     return (vector_rel_curr+LBJ_curr)
 
@@ -149,3 +152,4 @@ res=solver_normal(c1,(dict_FL['CP'][1],dict_FL['CP'][2]),c2,(dict_FR['CP'][1],di
 
 arr1=np.linspace(0.5,3,6)
 arr2=np.linspace(-0.5,-3,6)
+
