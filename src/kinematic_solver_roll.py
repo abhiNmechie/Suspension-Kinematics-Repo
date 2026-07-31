@@ -50,14 +50,15 @@ def lower(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_L,seed,const_dist):
     LBJ_curr=rodrigues(root,LBJ_stat_rel,k_L,vector_rel_origin)
     return (LBJ_curr,root)
 
-def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed):
+def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,TRI_stat,const_dict):
     kp_stat=((UBJ_stat-LBJ_stat)/(np.linlag.norm(UBJ_stat-LBJ_stat)))
     v_stat=(TRO_stat-LBJ_stat)
     centre_stat=(np.dot(v_stat,kp_stat)*kp_stat+LBJ_stat)
-    radius=np.linlag.norm(v_stat-np.dot(v_stat,kp_stat)*kp_stat)
+    radius=np.linalg.norm(v_stat-np.dot(v_stat,kp_stat)*kp_stat)
 
+    v_curr=(TRO_curr-LBJ_curr)
     kp_curr=((UBJ_curr-LBJ_curr)/(np.linlag.norm(UBJ_curr-LBJ_curr)))
-    centre_curr=(radius*kp_curr+LBJ_curr)
+    centre_curr=(np.dot(v_curr,kp_curr)*kp_curr+LBJ_curr)
 
     vect_tmp=np.array([1,0,0])
     if np.dot(vect_tmp,kp_curr)>0.9 or np.dot(vect_tmp,kp_curr)<(-0.9):
@@ -66,7 +67,7 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed):
     e1_curr=((vect_tmp-np.dot(vect_tmp,kp_curr)*kp_curr)/np.linalg.norm(vect_tmp-np.dot(vect_tmp,kp_curr)*kp_curr))
     e2_curr=np.cross(kp_curr,e1_curr)
     def residual(phi):
-        return (centre_curr+radius*np.cos(phi)*e1_curr+radius*np.sin(phi)*e2_curr)
+        return (np.linalg.norm((centre_curr+radius*np.cos(phi)*e1_curr+radius*np.sin(phi)*e2_curr)-TRI_stat)-const_dict)
 
     root=fsolve(residual,seed)[0]
     TRO_curr=(centre_curr+radius*np.cos(root)*e1_curr+radius*np.sin(root)*e2_curr)
@@ -74,7 +75,7 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed):
     return (TRO_curr,root)
 
 def seeder(UBJ_stat,LBJ_stat,TRO_stat):
-    kp_stat=((UBJ_stat-LBJ_stat)/(np.linlag.norm(UBJ_stat-LBJ_stat)))
+    kp_stat=((UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat)))
     v_stat=(TRO_stat-LBJ_stat)
 
     vect_tmp=np.array([1,0,0])
@@ -87,12 +88,12 @@ def seeder(UBJ_stat,LBJ_stat,TRO_stat):
     return seed_int
 
 def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector_stat):
-    e1_stat=(UBJ_stat-LBJ_stat)/np.linlag.norm(UBJ_stat-LBJ_stat)
-    e2_stat=(TRO_stat-LBJ_stat)/np.linlag.norm(TRO_stat-LBJ_stat)
+    e1_stat=(UBJ_stat-LBJ_stat)/np.linalg.norm(UBJ_stat-LBJ_stat)
+    e2_stat=(TRO_stat-LBJ_stat)/np.linalg.norm(TRO_stat-LBJ_stat)
     e3_stat=np.cross(e1_stat,e2_stat)
 
-    e1_curr=(UBJ_curr-LBJ_curr)/np.linlag.norm(UBJ_curr-LBJ_curr)
-    e2_curr=(TRO_curr-LBJ_curr)/np.linlag.norm(TRO_curr-LBJ_curr)
+    e1_curr=(UBJ_curr-LBJ_curr)/np.linalg.norm(UBJ_curr-LBJ_curr)
+    e2_curr=(TRO_curr-LBJ_curr)/np.linalg.norm(TRO_curr-LBJ_curr)
     e3_curr=np.cross(e1_curr,e2_curr)
 
     M=np.array([e1_stat,e2_stat,e3_stat])
@@ -100,9 +101,6 @@ def triad_transform(UBJ_curr,LBJ_curr,TRO_curr,UBJ_stat,LBJ_stat,TRO_stat,vector
     vector_rel_curr=(M.T)@(M)@(vector_rel_stat)
 
     return (vector_rel_curr+LBJ_curr)
-
-arr1=np.linspace(0,3,7)
-arr2=np.linspace(0,-3,7)
 
 #RC_Height_static:
 
@@ -149,3 +147,5 @@ res=solver_normal(c1,(dict_FL['CP'][1],dict_FL['CP'][2]),c2,(dict_FR['CP'][1],di
 
 #solver
 
+arr1=np.linspace(0.5,3,6)
+arr2=np.linspace(-0.5,-3,6)
