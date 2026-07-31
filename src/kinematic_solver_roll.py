@@ -7,6 +7,30 @@ from scipy.optimize import root_scalar
 from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U
 np.set_printoptions(suppress=True, precision=8)
 
+#output:
+#FL:
+out_dict_FL=dict()
+for k,v in dict_FL.items():
+    out_dict_FL[k]=np.zeros((13,3))
+    out_dict_FL[k][6]=v
+
+#RL:
+out_dict_RL=dict()
+for k,v in dict_RL.items():
+    out_dict_RL[k]=np.zeros((13,3))
+    out_dict_RL[k][6]=v
+
+#FR:
+out_dict_FR=dict()
+for k,v in dict_FR.items():
+    out_dict_FR[k]=np.zeros((13,3))
+    out_dict_FR[k][6]=v
+
+#RR:
+out_dict_RR=dict()
+for k,v in dict_RR.items():
+    out_dict_RR[k]=np.zeros((13,3))
+    out_dict_RR[k][6]=v
 
 def rodrigues(theta,BJ_stat_rel,k,vector_rel_origin):
     I=np.identity(3)
@@ -123,4 +147,5 @@ c1=solver_wishbones(dict_FL['UF'],dict_FL['UA'],dict_FL['UBJ'],dict_FL['LF'],dic
 c2=solver_wishbones(dict_FR['UF'],dict_FR['UA'],dict_FR['UBJ'],dict_FR['LF'],dict_FR['LA'],dict_FR['LBJ'])
 res=solver_normal(c1,(dict_FL['CP'][1],dict_FL['CP'][2]),c2,(dict_FR['CP'][1],dict_FR['CP'][2]))
 
-print(res[1])
+#solver
+
