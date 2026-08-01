@@ -4,7 +4,8 @@ import scipy as sp
 from scipy.optimize import brentq
 from scipy.optimize import fsolve
 from scipy.optimize import root_scalar
-from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U
+from scipy.optimize import least_squares
+from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U,front_static_camber
 np.set_printoptions(suppress=True, precision=8)
 
 #output:
@@ -50,7 +51,7 @@ def lower(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_L,seed,const_dist):
     LBJ_curr=rodrigues(root,LBJ_stat_rel,k_L,vector_rel_origin)
     return (LBJ_curr,root)
 
-def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,TRI_stat,const_dict):
+def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,TRI_stat,const_dist):
     kp_stat=((UBJ_stat-LBJ_stat)/(np.linalg.norm(UBJ_stat-LBJ_stat)))
     v_stat=(TRO_stat-LBJ_stat)
     centre_stat=(np.dot(v_stat,kp_stat)*kp_stat+LBJ_stat)
@@ -66,7 +67,7 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,TRI_stat,const_dict
     e1_curr=((vect_tmp-np.dot(vect_tmp,kp_curr)*kp_curr)/np.linalg.norm(vect_tmp-np.dot(vect_tmp,kp_curr)*kp_curr))
     e2_curr=np.cross(kp_curr,e1_curr)
     def residual(phi):
-        return (np.linalg.norm((centre_curr+radius*np.cos(phi)*e1_curr+radius*np.sin(phi)*e2_curr)-TRI_stat)-const_dict)
+        return (np.linalg.norm((centre_curr+radius*np.cos(phi)*e1_curr+radius*np.sin(phi)*e2_curr)-TRI_stat)-const_dist)
 
     root=fsolve(residual,seed)[0]
     TRO_curr=(centre_curr+radius*np.cos(root)*e1_curr+radius*np.sin(root)*e2_curr)
@@ -148,7 +149,65 @@ c2=solver_wishbones(dict_FR['UF'],dict_FR['UA'],dict_FR['UBJ'],dict_FR['LF'],dic
 res=solver_normal(c1,(dict_FL['CP'][1],dict_FL['CP'][2]),c2,(dict_FR['CP'][1],dict_FR['CP'][2]))
 
 #solver
-
 arr1=np.linspace(0.5,3,6)
 arr2=np.linspace(-0.5,-3,6)
+def roll_solver(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corner_k_U,corner_k_L):
+    seed1=0.0
+    seed2=seeder(input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'])
+    seed3=0.0
+    i=0
+    for alpha in arr1:
+        def residual(theta_U):
+            UBJ_curr=upper(theta_U,(input_corner_dict['UBJ']-input_corner_dict['UA']),input_corner_dict['UA'],corner_k_U)
+            LBJ_curr=lower(UBJ_curr,(input_corner_dict['LBJ']-input_corner_dict['LA']),input_corner_dict['LA'],corner_k_L,seed1,const_d1)[0]
+            TRO_curr=tierod(UBJ_curr,LBJ_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],seed2,input_corner_dict['TRI'],const_d2)[0]
+            CP_curr=triad_transform(UBJ_curr,LBJ_curr,TRO_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
+            return [CP_curr[2]-(CP_curr[1]*np.tan(np.radians(alpha))+res[1]*(1-(1/np.cos(np.radians(alpha)))))]
+        
+        root3=fsolve(residual,seed3,xtol=1e-10)[0]
 
+        output_corner_dict['UBJ'][i+7][:]=upper(root3,(input_corner_dict['UBJ']-input_corner_dict['UA']),input_corner_dict['UA'],corner_k_U)
+
+        output_corner_dict['LBJ'][i+7][:]=lower(output_corner_dict['UBJ'][i+7][:],(input_corner_dict['LBJ']-input_corner_dict['LA']),input_corner_dict['LA'],corner_k_L,seed1,const_d1)[0]
+        root1=lower(output_corner_dict['UBJ'][i+7][:],(input_corner_dict['LBJ']-input_corner_dict['LA']),input_corner_dict['LA'],corner_k_L,seed1,const_d1)[1]
+
+        output_corner_dict['TRO'][i+7][:]=tierod(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],seed2,input_corner_dict['TRI'],const_d2)[0]
+        root2=tierod(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],seed2,input_corner_dict['TRI'],const_d2)[1]
+
+        output_corner_dict['WC'][i+7][:]=triad_transform(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],output_corner_dict['TRO'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['WC'])
+        output_corner_dict['CP'][i+7][:]=triad_transform(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],output_corner_dict['TRO'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
+        seed1=root1+(root1-seed1)
+        seed2=root2+(root2-seed2)
+        seed3=root3+(root3-seed3)
+        i=i+1
+
+    i=0
+    for alpha in arr2:
+        def residual(theta_U):
+            UBJ_curr=upper(theta_U,(input_corner_dict['UBJ']-input_corner_dict['UA']),input_corner_dict['UA'],corner_k_U)
+            LBJ_curr=lower(UBJ_curr,(input_corner_dict['LBJ']-input_corner_dict['LA']),input_corner_dict['LA'],corner_k_L,seed1,const_d1)[0]
+            TRO_curr=tierod(UBJ_curr,LBJ_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],seed2,input_corner_dict['TRI'],const_d2)[0]
+            CP_curr=triad_transform(UBJ_curr,LBJ_curr,TRO_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
+            return [CP_curr[2]-(CP_curr[1]*np.tan(np.radians(alpha))+res[1]*(1-(1/np.cos(np.radians(alpha)))))]
+        
+        root3=fsolve(residual,seed3,xtol=1e-10)[0]
+
+        output_corner_dict['UBJ'][i+5][:]=upper(root3,(input_corner_dict['UBJ']-input_corner_dict['UA']),input_corner_dict['UA'],corner_k_U)
+
+        output_corner_dict['LBJ'][i+5][:]=lower(output_corner_dict['UBJ'][i+5][:],(input_corner_dict['LBJ']-input_corner_dict['LA']),input_corner_dict['LA'],corner_k_L,seed1,const_d1)[0]
+        root1=lower(output_corner_dict['UBJ'][i+5][:],(input_corner_dict['LBJ']-input_corner_dict['LA']),input_corner_dict['LA'],corner_k_L,seed1,const_d1)[1]
+
+        output_corner_dict['TRO'][i+5][:]=tierod(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],seed2,input_corner_dict['TRI'],const_d2)[0]
+        root2=tierod(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],seed2,input_corner_dict['TRI'],const_d2)[1]
+
+        output_corner_dict['WC'][i+5][:]=triad_transform(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],output_corner_dict['TRO'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['WC'])
+        output_corner_dict['CP'][i+5][:]=triad_transform(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],output_corner_dict['TRO'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
+        seed1=root1+(root1-seed1)
+        seed2=root2+(root2-seed2)
+        seed3=root3+(root3-seed3)
+        i=i-1
+
+roll_solver(dict_FL,out_dict_FL,FL_d1,FL_d2,FL_d3,FL_k_U,FL_k_L)
+roll_solver(dict_FR,out_dict_FR,FR_d1,FR_d2,FR_d3,FR_k_U,FR_k_L)
+roll_solver(dict_RL,out_dict_RL,RL_d1,RL_d2,RL_d3,RL_k_U,RL_k_L)
+roll_solver(dict_RR,out_dict_RR,RR_d1,RR_d2,RR_d3,RR_k_U,RR_k_L) 
