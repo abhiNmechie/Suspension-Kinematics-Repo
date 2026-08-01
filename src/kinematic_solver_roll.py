@@ -9,6 +9,8 @@ from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d
 np.set_printoptions(suppress=True, precision=8)
 
 #output:
+#rc_height:
+rc_arr=np.zeros(13)
 #FL:
 out_dict_FL=dict()
 for k,v in dict_FL.items():
@@ -47,7 +49,7 @@ def upper(theta_U,UBJ_stat_rel,vector_rel_origin,k_U):
 def lower(UBJ_curr,LBJ_stat_rel,vector_rel_origin,k_L,seed,const_dist):
     def residual(theta_L):
         return (np.linalg.norm(UBJ_curr-rodrigues(theta_L,LBJ_stat_rel,k_L,vector_rel_origin))-const_dist)
-    root=fsolve(residual,seed)[0]
+    root=least_squares(residual,seed,method='lm',xtol=1e-10).x[0]
     LBJ_curr=rodrigues(root,LBJ_stat_rel,k_L,vector_rel_origin)
     return (LBJ_curr,root)
 
@@ -69,7 +71,7 @@ def tierod(UBJ_curr,LBJ_curr,UBJ_stat,LBJ_stat,TRO_stat,seed,TRI_stat,const_dist
     def residual(phi):
         return (np.linalg.norm((centre_curr+radius*np.cos(phi)*e1_curr+radius*np.sin(phi)*e2_curr)-TRI_stat)-const_dist)
 
-    root=fsolve(residual,seed)[0]
+    root=least_squares(residual,seed,method='lm',xtol=1e-10).x[0]
     TRO_curr=(centre_curr+radius*np.cos(root)*e1_curr+radius*np.sin(root)*e2_curr)
 
     return (TRO_curr,root)
@@ -164,7 +166,7 @@ def roll_solver(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,
             CP_curr=triad_transform(UBJ_curr,LBJ_curr,TRO_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
             return [CP_curr[2]-(CP_curr[1]*np.tan(np.radians(alpha))+res[1]*(1-(1/np.cos(np.radians(alpha)))))]
         
-        root3=fsolve(residual,seed3,xtol=1e-10)[0]
+        root3=least_squares(residual,seed3,method='lm',xtol=1e-10).x[0]
 
         output_corner_dict['UBJ'][i+7][:]=upper(root3,(input_corner_dict['UBJ']-input_corner_dict['UA']),input_corner_dict['UA'],corner_k_U)
 
@@ -176,11 +178,16 @@ def roll_solver(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,
 
         output_corner_dict['WC'][i+7][:]=triad_transform(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],output_corner_dict['TRO'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['WC'])
         output_corner_dict['CP'][i+7][:]=triad_transform(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],output_corner_dict['TRO'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
-        seed1=root1+(root1-seed1)
-        seed2=root2+(root2-seed2)
-        seed3=root3+(root3-seed3)
+        seed1=root1
+        seed2=root2
+        seed3=root3
+        output_corner_dict['WSP'][i+7][:]=triad_transform(output_corner_dict['UBJ'][i+7][:],output_corner_dict['LBJ'][i+7][:],output_corner_dict['TRO'][i+7][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['WSP'])
         i=i+1
 
+
+    seed1=0.0
+    seed2=seeder(input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'])
+    seed3=0.0
     i=0
     for alpha in arr2:
         def residual(theta_U):
@@ -190,7 +197,7 @@ def roll_solver(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,
             CP_curr=triad_transform(UBJ_curr,LBJ_curr,TRO_curr,input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
             return [CP_curr[2]-(CP_curr[1]*np.tan(np.radians(alpha))+res[1]*(1-(1/np.cos(np.radians(alpha)))))]
         
-        root3=fsolve(residual,seed3,xtol=1e-10)[0]
+        root3=least_squares(residual,seed3,method='lm',xtol=1e-10).x[0]
 
         output_corner_dict['UBJ'][i+5][:]=upper(root3,(input_corner_dict['UBJ']-input_corner_dict['UA']),input_corner_dict['UA'],corner_k_U)
 
@@ -202,10 +209,19 @@ def roll_solver(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,
 
         output_corner_dict['WC'][i+5][:]=triad_transform(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],output_corner_dict['TRO'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['WC'])
         output_corner_dict['CP'][i+5][:]=triad_transform(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],output_corner_dict['TRO'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['CP'])
-        seed1=root1+(root1-seed1)
-        seed2=root2+(root2-seed2)
-        seed3=root3+(root3-seed3)
+        seed1=root1
+        seed2=root2
+        seed3=root3
+        output_corner_dict['WSP'][i+5][:]=triad_transform(output_corner_dict['UBJ'][i+5][:],output_corner_dict['LBJ'][i+5][:],output_corner_dict['TRO'][i+5][:],input_corner_dict['UBJ'],input_corner_dict['LBJ'],input_corner_dict['TRO'],input_corner_dict['WSP'])
         i=i-1
+        output_corner_dict['UA'][:]=input_corner_dict['UA']
+    output_corner_dict['UF'][:]=input_corner_dict['UF']
+    output_corner_dict['LA'][:]=input_corner_dict['LA']
+    output_corner_dict['LF'][:]=input_corner_dict['LF']
+    output_corner_dict['RPA1'][:]=input_corner_dict['RPA1']
+    output_corner_dict['RPA2'][:]=input_corner_dict['RPA2']
+    output_corner_dict['DC'][:]=input_corner_dict['DC']
+    output_corner_dict['TRI'][:]=input_corner_dict['TRI']
 
 roll_solver(dict_FL,out_dict_FL,FL_d1,FL_d2,FL_d3,FL_k_U,FL_k_L)
 roll_solver(dict_FR,out_dict_FR,FR_d1,FR_d2,FR_d3,FR_k_U,FR_k_L)
