@@ -7,7 +7,7 @@ from scipy.optimize import root_scalar
 from hardpoint_io import dict_FL,dict_FR,dict_RL, dict_RR,FL_d1,FL_d2,FL_d3,FR_d1,FR_d2,FR_d3,RL_d1,RL_d2,RL_d3,RR_d1,RR_d2,RR_d3,FL_k_L,FL_k_U,FR_k_L,FR_k_U,RL_k_L,RL_k_U,RR_k_L,RR_k_U
 np.set_printoptions(suppress=True, precision=8)
 
-#for front ledft:
+#for front left:
 out_dict_FL=dict()
 for k,v in dict_FL.items():
     out_dict_FL[k]=np.zeros((51,3))
@@ -25,7 +25,7 @@ for k,v in dict_RL.items():
     out_dict_RL[k]=np.zeros((51,3))
     out_dict_RL[k][25]=v
 
-#for rear right:
+#for rear righ
 out_dict_RR=dict()
 for k,v in dict_RR.items():
     out_dict_RR[k]=np.zeros((51,3))
@@ -247,4 +247,5 @@ def corner(input_corner_dict,output_corner_dict,const_d1,const_d2,const_d3,corne
 corner(dict_FL,out_dict_FL,FL_d1,FL_d2,FL_d3,FL_k_U,FL_k_L)
 corner(dict_FR,out_dict_FR,FR_d1,FR_d2,FR_d3,FR_k_U,FR_k_L)
 corner(dict_RL,out_dict_RL,RL_d1,RL_d2,RL_d3,RL_k_U,RL_k_L)
-corner(dict_RR,out_dict_RR,RR_d1,RR_d2,RR_d3,RR_k_U,RR_k_L) 
+corner(dict_RR,out_dict_RR,RR_d1,RR_d2,RR_d3,RR_k_U,RR_k_L)
+
